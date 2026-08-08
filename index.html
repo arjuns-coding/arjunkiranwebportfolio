@@ -113,6 +113,19 @@
   }
   @keyframes introFadeUp{ to{ opacity:1; transform:translateY(0); } }
 
+  /* ---------- top-of-site scroll cue ---------- */
+  .scroll-cue{
+    position:fixed; right:clamp(20px,6vw,64px); bottom:34px; z-index:65;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    opacity:0; pointer-events:none; transition:opacity .5s ease;
+  }
+  .scroll-cue.show{ opacity:1; }
+  .scroll-cue span{ font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:rgba(247,246,242,.6); }
+  .scroll-cue-arrow{ width:34px; height:34px; border-radius:50%; border:1px solid rgba(247,246,242,.35); display:flex; align-items:center; justify-content:center; animation:scrollCueBounce 1.6s ease-in-out infinite; }
+  .scroll-cue-arrow svg{ width:14px; height:14px; }
+  @keyframes scrollCueBounce{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(8px); } }
+  @media (max-width:900px){ .scroll-cue{ bottom:88px; } }
+
   .intro-tolife{
     flex-direction:column;
     background:linear-gradient(180deg, #05060d 0%, #0b1330 22%, #16234a 42%, #2b3bff 68%, #6f6bd6 84%, #ffb800 108%);
@@ -362,6 +375,13 @@
 <!-- INTRO: Bringing code -->
 <div class="intro-panel intro-bringing" id="introBringing">
   <div class="intro-text">Bringing code</div>
+</div>
+
+<div class="scroll-cue" id="scrollCue">
+  <span>Scroll</span>
+  <div class="scroll-cue-arrow">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#f7f6f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>
+  </div>
 </div>
 
 <!-- INTRO: sunrise scene with mountains, river, sun + plants sprout, "to life" -->
@@ -666,7 +686,7 @@
 
 <footer>
   <div class="footer-inner">
-    <div class="footer-copy">© 2026 Arjun Kiran. Built with HTML, CSS, and JS. Claude for opening sequence.</div>
+    <div class="footer-copy">© 2026 Arjun Kiran. Built with HTML, CSS, and JS. Opening sequence by Claude.</div>
     <div class="footer-links">
       <a href="https://linkedin.com/in/arjun-kiran" target="_blank" rel="noopener" class="interactive">LinkedIn</a>
       <a href="#experience" class="interactive">Experience</a>
@@ -721,6 +741,14 @@
     el.addEventListener('mouseenter', () => { label.textContent = el.getAttribute('data-cursor'); label.classList.add('show'); });
     el.addEventListener('mouseleave', () => { label.classList.remove('show'); });
   });
+
+  // ---- scroll cue: only shown while the very top intro panel is in view ----
+  const scrollCue = document.getElementById('scrollCue');
+  const introBringingEl = document.getElementById('introBringing');
+  const scrollCueObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { scrollCue.classList.toggle('show', entry.isIntersecting); });
+  }, { threshold: 0.4 });
+  if (introBringingEl) scrollCueObserver.observe(introBringingEl);
 
   // ---- utility bar style swap on dark sections (intro panels + cover) ----
   const utilityBar = document.getElementById('utilityBar');
